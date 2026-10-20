@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Special Surprise For Aaron ❤️</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #fce4ec;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .page-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease-in-out;
+    }
+
+    .page.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #page-lock { background-image: url('1-kilit.png'); }
+    #page-boxes { background-image: url('2-kutular.png'); }
+    #page-dragonball { background-image: url('3-dragonball.png'); }
+    #page-letter { background-image: url('4-mektup.png'); }
+    #page-playlist { background-image: url('5-playlist.png'); }
+    #page-game { background-image: url('6-oyun.png'); }
+
+    /* HOTSPOTS */
+    .hotspot {
+      position: absolute;
+      cursor: pointer;
+    }
+
+    .keypad-grid {
+      position: absolute;
+      bottom: 11%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      height: 380px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .key-touch {
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .key-touch:active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Sağ Alt Tıklanabilir Alanlar */
+    .btn-next-back {
+      position: absolute;
+      bottom: 3%;
+      right: 4%;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+    }
+
+    /* Kutular Sayfasındaki 4 Sürpriz Kutu */
+    .box-1 { top: 22%; left: 8%; width: 20%; height: 55%; }
+    .box-2 { top: 22%; left: 30%; width: 20%; height: 55%; }
+    .box-3 { top: 22%; left: 52%; width: 20%; height: 55%; }
+    .box-4 { top: 22%; left: 74%; width: 20%; height: 55%; }
+
+    /* Müzik Plak Butonu */
+    #record-btn {
+      position: absolute;
+      top: 32%;
+      left: 10%;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .record-rotate {
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Oyundaki Kalp Yakalama */
+    #catch-heart {
+      position: absolute;
+      font-size: 40px;
+      cursor: pointer;
+      animation: pulse 0.8s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.2); }
+    }
+
+    #score-display {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff4081;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 20px;
+      border-radius: 20px;
+    }
+
+    /* Oyun Kazanma Modalı */
+    #win-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+      z-index: 100;
+    }
+
+    #win-modal.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <audio id="bg-music" src="lovesong.mp3" loop></audio>
+
+  <div class="page-container">
+
+    <!-- 1. KİLİT EKRANI -->
+    <div id="page-lock" class="page active">
+      <div class="keypad-grid">
+        <div class="key-touch" onclick="pressKey('1')"></div>
+        <div class="key-touch" onclick="pressKey('2')"></div>
+        <div class="key-touch" onclick="pressKey('3')"></div>
+        <div class="key-touch" onclick="pressKey('4')"></div>
+        <div class="key-touch" onclick="pressKey('5')"></div>
+        <div class="key-touch" onclick="pressKey('6')"></div>
+        <div class="key-touch" onclick="pressKey('7')"></div>
+        <div class="key-touch" onclick="pressKey('8')"></div>
+        <div class="key-touch" onclick="pressKey('9')"></div>
+        <div></div>
+        <div class="key-touch" onclick="pressKey('0')"></div>
+        <div class="key-touch" onclick="checkPin()"></div>
+      </div>
+    </div>
+
+    <!-- 2. KUTULAR SAYFASI -->
+    <div id="page-boxes" class="page">
+      <div class="hotspot box-1" onclick="showPage('page-dragonball')"></div>
+      <div class="hotspot box-2" onclick="showPage('page-letter')"></div>
+      <div class="hotspot box-3" onclick="showPage('page-playlist')"></div>
+      <div class="hotspot box-4" onclick="startGame()"></div>
+    </div>
+
+    <!-- 3. DRAGONBALL SAYFASI -->
+    <div id="page-dragonball" class="page">
+      <div class="hotspot btn-next-back" onclick="showPage('page-boxes')"></div>
+    </div>
+
+    <!-- 4. MEKTUP SAYFASI -->
+    <div id="page-letter" class="page">
+      <div class="hotspot btn-next-back" onclick="showPage('page-boxes')"></div>
+    </div>
+
+    <!-- 5. PLAYLIST SAYFASI -->
+    <div id="page-playlist" class="page">
+      <div id="record-btn" onclick="toggleMusic()"></div>
+      <div class="hotspot btn-next-back" onclick="showPage('page-boxes')"></div>
+    </div>
+
+    <!-- 6. OYUN SAYFASI -->
+    <div id="page-game" class="page">
+      <div id="score-display">HEARTS: 0 / 5</div>
+      <div id="game-area" style="width:100%; height:100%; position:relative;"></div>
+      <div class="hotspot btn-next-back" onclick="showPage('page-boxes')"></div>
+    </div>
+
+  </div>
+
+  <!-- Oyun Kazanma Kutusu -->
+  <div id="win-modal">
+    <h2>🎉 You Won My Heart! ❤️</h2>
+    <p style="margin-top: 10px;">I love you so much!</p>
+    <button onclick="showPage('page-boxes')" style="margin-top: 20px; padding: 10px 20px; border:none; background:#ff4081; color:white; border-radius:10px; cursor:pointer;">Back to Surprise Box</button>
+  </div>
+
+  <script>
+    const CORRECT_PIN = "0807";
+    let enteredPin = "";
+    let score = 0;
+    const bgMusic = document.getElementById('bg-music');
+
+    function pressKey(num) {
+      if (enteredPin.length < 4) {
+        enteredPin += num;
+      }
+    }
+
+    function checkPin() {
+      if (enteredPin === CORRECT_PIN) {
+        showPage('page-boxes');
+        bgMusic.play();
+      } else {
+        enteredPin = "";
+        alert("Opps! Wrong Code ❤️ Try again!");
+      }
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    function toggleMusic() {
+      const recordBtn = document.getElementById('record-btn');
+      if (bgMusic.paused) {
+        bgMusic.play();
+        recordBtn.classList.add('record-rotate');
+      } else {
+        bgMusic.pause();
+        recordBtn.classList.remove('record-rotate');
+      }
+    }
+
+    function startGame() {
+      showPage('page-game');
+      score = 0;
+      document.getElementById('score-display').innerText = "HEARTS: 0 / 5";
+      document.getElementById('win-modal').classList.remove('show');
+      spawnHeart();
+    }
+
+    function spawnHeart() {
+      const gameArea = document.getElementById('game-area');
+      const oldHeart = document.querySelector('.catch-heart');
+      if (oldHeart) oldHeart.remove();
+
+      if (score >= 5) {
+        document.getElementById('win-modal').classList.add('show');
+        return;
+      }
+
+      const heart = document.createElement('div');
+      heart.className = 'catch-heart';
+      heart.innerHTML = '💖';
+      
+      const maxX = gameArea.clientWidth - 50;
+      const maxY = gameArea.clientHeight - 50;
+      
+      const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+      const randomY = Math.max(40, Math.floor(Math.random() * maxY));
+
+      heart.style.left = randomX + 'px';
+      heart.style.top = randomY + 'px';
+
+      heart.onclick = function() {
+        score++;
+        document.getElementById('score-display').innerText = "HEARTS: " + score + " / 5";
+        spawnHeart();
+      };
+
+      gameArea.appendChild(heart);
+    }
+  </script>
+
+</body>
+</html>
